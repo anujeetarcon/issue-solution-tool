@@ -5,7 +5,6 @@ from database import Base
 
 class Category(Base):
     __tablename__ = "categories"
-
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(100), unique=True, nullable=False)
     issues = relationship("Issue", back_populates="category_rel")
@@ -13,15 +12,16 @@ class Category(Base):
 
 class Issue(Base):
     __tablename__ = "issues"
-
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String(255), nullable=False)
     category = Column(String(100), nullable=False)
-    severity = Column(String(20), nullable=False, default="medium")  # low, medium, high
+    severity = Column(String(20), nullable=False, default="medium")
     symptoms = Column(Text, nullable=False)
-    cause = Column(Text, nullable=False)
+    cause = Column(Text, nullable=True)
+    image_path = Column(String(500), nullable=True)
+    status = Column(String(30), nullable=False, default="solution_added")
+    solution_summary = Column(Text, nullable=True)
     category_id = Column(Integer, ForeignKey("categories.id"), nullable=True)
-
     category_rel = relationship("Category", back_populates="issues")
     solutions = relationship("Solution", back_populates="issue", cascade="all, delete-orphan")
     tags = relationship("Tag", back_populates="issue", cascade="all, delete-orphan")
@@ -29,20 +29,16 @@ class Issue(Base):
 
 class Solution(Base):
     __tablename__ = "solutions"
-
     id = Column(Integer, primary_key=True, index=True)
     issue_id = Column(Integer, ForeignKey("issues.id"), nullable=False)
     step_number = Column(Integer, nullable=False)
     description = Column(Text, nullable=False)
-
     issue = relationship("Issue", back_populates="solutions")
 
 
 class Tag(Base):
     __tablename__ = "tags"
-
     id = Column(Integer, primary_key=True, index=True)
     issue_id = Column(Integer, ForeignKey("issues.id"), nullable=False)
     name = Column(String(50), nullable=False)
-
     issue = relationship("Issue", back_populates="tags")
